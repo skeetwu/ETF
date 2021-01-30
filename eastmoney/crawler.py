@@ -1,41 +1,88 @@
-import openpyxl
+# !/usr/bin/env python
+# vi: set ft=python sts=4 ts=4 sw=4 et:
+# -*- coding: utf-8 -*-
 
-def write_excel_xlsx(path, sheet_name, value):
-    index = len(value)
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    sheet.title = sheet_name
-    for i in range(0, index):
-        for j in range(0, len(value[i])):
-            sheet.cell(row=i + 1, column=j + 1, value=str(value[i][j]))
-    workbook.save(path)
-    print("xlsx格式表格写入数据成功！")
+from flask import render_template, Blueprint
+import urllib.request
 
-def read_excel_xlsx(path, sheet_name):
-    workbook = openpyxl.load_workbook(path)
-    # sheet = wb.get_sheet_by_name(sheet_name)这种方式已经弃用，不建议使用
-    sheet = workbook[sheet_name]
-    for row in sheet.rows:
-        if row[0].value and isinstance(row[0].value, int) and row[0].value > 1 and row[0].value <1000000:
-            for cell in row:
-                print(cell.value, "\t", end="")
-                if cell.hyperlink and cell.hyperlink.display:
-                    print(cell.hyperlink.display, "\t", end="")
-                    cell.hyperlink.display = '999' + cell.hyperlink.display
-            print()
-    # workbook.save(path)    #
+from lxml import etree
+
+index = Blueprint('pages', __name__ + 'pages', url_prefix='')
 
 
-book_name_xlsx = '../excel/base.xlsx'
+@index.route('/etf')
+def etf():
+    return render_template('etf.html', etf_all_list=get_etf_detail())
 
-sheet_name_xlsx = 'Sheet1'
 
-value3 = [["姓名", "性别", "年龄", "城市", "职业"],
-          ["111", "女", "66", "石家庄", "运维工程师"],
-          ["222", "男", "55", "南京", "饭店老板"],
-          ["333", "女", "27", "苏州", "保安"], ]
+da_file = 'etf_numbers.data'
 
-# write_excel_xlsx(book_name_xlsx, sheet_name_xlsx, value3)
+base_url = 'http://fund.eastmoney.com/'
 
-if __name__ == '__main__':
-    read_excel_xlsx(book_name_xlsx, sheet_name_xlsx)
+
+def get_etf_detail():
+    etf_all_list = []
+    with open(da_file, 'r') as f:
+        for line in f.readlines():
+            if line.strip():
+
+                etf = {}
+                # time.sleep(1)
+                _url = '%s/%s.html' % (base_url, line.strip())
+                print(line.strip())
+                etf['etf_code'] = line.strip()
+                response = urllib.request.urlopen(_url).read()
+                selector = etree.HTML(response)
+                div_num = 11
+                sub_div_num = 3
+                # 基金名称
+                etf_name = selector.xpath('//*[@id="body"]/div[%s]/div/div/div[1]/div[1]/div/text()' % div_num)
+                if not etf_name:
+                    div_num = 12
+                    etf_name = selector.xpath('//*[@id="body"]/div[%s]/div/div/div[1]/div[1]/div/text()' % div_num)
+                etf['etf_name'] = etf_name[0]
+                # 基金规模
+                etf_guimo = selector.xpath(
+                    '//*[@id="body"]/div[%s]/div/div/div[%s]/div[1]/div[2]/table/tr[1]/td[2]/text()' % (
+                        div_num, sub_div_num))
+                if not etf_guimo:
+                    sub_div_num = 2
+                    etf_guimo = selector.xpath(
+                        '//*[@id="body"]/div[%s]/div/div/div[%s]/div[1]/div[2]/table/tr[1]/td[2]/text()' % (
+                            div_num, sub_div_num))
+                print(etf_guimo)
+                etf['etf_guimo'] = etf_guimo[0][1:]
+
+                # 基金成立日期
+                etf_chengliriqi = selector.xpath(
+                    '//*[@id="body"]/div[%s]/div/div/div[%s]/div[1]/div[2]/table/tr[2]/td[1]/text()' % (
+                        div_num, sub_div_num))
+                etf['etf_chengliriqi'] = etf_chengliriqi[0][1:]
+
+                # 基金跟踪标的
+                etf_genzongbiaodi = selector.xpath(
+                    '//*[@id="body"]/div[%s]/div/div/div[%s]/div[1]/div[2]/table/tr[3]/td/text()[1]' % (
+                        div_num, sub_div_num))
+                etf['etf_genzongbiaodi'] = etf_genzongbiaodi[0][:-3]
+
+                # 重仓前十股票及其URL
+                for i in range(2, 12):
+                    etf_top = selector.xpath('//*[@id="position_shares"]/div[1]/table/tr[%s]/td[1]/a/text()' % i)
+                    if not etf_top:
+                        etf_top = ['-']
+                    etf['etf_top%s' % (i - 1)] = etf_top[0]
+                    etf_top_url = selector.xpath('//*[@id="position_shares"]/div[1]/table/tr[%s]/td[1]/a/@href' % i)
+                    if not etf_top_url:
+                        etf_top_url = ['-']
+                    etf['etf_top%s_url' % (i - 1)] = etf_top_url[0]
+
+                # 前十总占比
+                etf_qianshizongzhanbi = selector.xpath('//*[@id="position_shares"]/div[1]/p/span[2]/text()')
+                if not etf_qianshizongzhanbi:
+                    etf_qianshizongzhanbi = ['-']
+                etf['etf_qianshizongzhanbi'] = etf_qianshizongzhanbi[0]
+
+                # print(etf)
+                etf_all_list.append(etf)
+
+    return etf_all_list
