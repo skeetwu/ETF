@@ -36,10 +36,5 @@ def create_app():
     app.register_blueprint(index)
     return app
 
-
-da_file = 'etf_numbers.small.data'
-
-base_url = 'http://fund.eastmoney.com/'
-
 if __name__ == "__main__":
     create_app().run(debug=True, use_reloader=True, host="0.0.0.0")

@@ -7,7 +7,7 @@ import urllib.request
 from flask import render_template, Blueprint
 from lxml import etree
 
-from etf_app import da_file, base_url
+from config import da_file, base_url
 
 index = Blueprint('pages', __name__ + 'pages', url_prefix='')
 

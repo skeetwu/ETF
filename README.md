@@ -25,6 +25,8 @@
 
 excel/etf.xlsx是一个demo。
 
+excel/result_20210129.xlsx是朋友分析的结果，应该根据这个表就可以在每个版块中选择一支最合适的购买ETF基金了。
+
 ## 注意
 
 xpath可以使用Chrome的debug模式，选中值或者dom对象，然后右键copy。
