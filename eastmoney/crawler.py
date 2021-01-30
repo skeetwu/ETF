@@ -2,10 +2,12 @@
 # vi: set ft=python sts=4 ts=4 sw=4 et:
 # -*- coding: utf-8 -*-
 
-from flask import render_template, Blueprint
 import urllib.request
 
+from flask import render_template, Blueprint
 from lxml import etree
+
+from etf_app import da_file, base_url
 
 index = Blueprint('pages', __name__ + 'pages', url_prefix='')
 
@@ -15,9 +17,6 @@ def etf():
     return render_template('etf.html', etf_all_list=get_etf_detail())
 
 
-da_file = 'etf_numbers.data'
-
-base_url = 'http://fund.eastmoney.com/'
 
 
 def get_etf_detail():
@@ -50,7 +49,6 @@ def get_etf_detail():
                     etf_guimo = selector.xpath(
                         '//*[@id="body"]/div[%s]/div/div/div[%s]/div[1]/div[2]/table/tr[1]/td[2]/text()' % (
                             div_num, sub_div_num))
-                print(etf_guimo)
                 etf['etf_guimo'] = etf_guimo[0][1:]
 
                 # 基金成立日期

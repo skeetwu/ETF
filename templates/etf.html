@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<title>ETF</title>
+<head>
+    <style type="text/css">
+    table.imagetable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #999999;
+        border-collapse: collapse;
+    }
+    table.imagetable th {
+        background:#b5cfd2 url('cell-blue.jpg');
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #999999;
+    }
+    table.imagetable td {
+        background:#dcddc0 url('cell-grey.jpg');
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #999999;
+    }
+    </style>
+</head>
+<body>
+<!-- Table goes in the document BODY -->
+    <table class="imagetable">
+    <tr>
+        <th>基金代码</th>
+        <th>基金简称</th>
+        <th>跟踪指数</th>
+        <th>基金规模</th>
+        <th>基金成立日期</th>
+        <th>重仓前十</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>-</th>
+        <th>前十占比</th>
+    </tr>
+     {% for etf in etf_all_list %}
+
+        <tr>
+            <td>{{ etf.etf_code }}</td>
+            <td>{{ etf.etf_name }}</td>
+            <td>{{ etf.etf_genzongbiaodi }}</td>
+            <td>{{ etf.etf_guimo }}</td>
+            <td>{{ etf.etf_chengliriqi }}</td>
+            <td><a href="{{ etf.etf_top1_url }}" target="_blank"> {{ etf.etf_top1 }}</a></td>
+            <td><a href="{{ etf.etf_top2_url }}" target="_blank"> {{ etf.etf_top2 }}</a></td>
+            <td><a href="{{ etf.etf_top3_url }}" target="_blank"> {{ etf.etf_top3 }}</a></td>
+            <td><a href="{{ etf.etf_top4_url }}" target="_blank"> {{ etf.etf_top4 }}</a></td>
+            <td><a href="{{ etf.etf_top5_url }}" target="_blank"> {{ etf.etf_top5 }}</a></td>
+            <td><a href="{{ etf.etf_top6_url }}" target="_blank"> {{ etf.etf_top6 }}</a></td>
+            <td><a href="{{ etf.etf_top7_url }}" target="_blank"> {{ etf.etf_top7 }}</a></td>
+            <td><a href="{{ etf.etf_top8_url }}" target="_blank"> {{ etf.etf_top8 }}</a></td>
+            <td><a href="{{ etf.etf_top9_url }}" target="_blank"> {{ etf.etf_top9 }}</a></td>
+            <td><a href="{{ etf.etf_top10_url }}" target="_blank"> {{ etf.etf_top10 }}</a></td>
+
+            <td>{{ etf.etf_qianshizongzhanbi }}</td>
+        </tr>
+     {% endfor %}
+
+
+    </table>
+</body>
+</html>
+
+
+
+
+
